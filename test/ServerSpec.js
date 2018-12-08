@@ -137,7 +137,6 @@ describe('', function() {
 
       request(options, function(error, res, body) {
         var queryString = 'SELECT * FROM users where username = "Samantha"';
-        // console.log("THIS IS INSIDE THE TEST", queryString);
         db.query(queryString, function(err, rows) {
           if (err) { done(err); }
           var user = rows[0];
@@ -481,7 +480,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Sessions and cookies', function() {
+  describe('Sessions and cookies', function() {
     var requestWithSession;
     var cookieJar;
 

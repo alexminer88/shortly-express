@@ -18,9 +18,7 @@ const parseCookies = (req, res, next) => {
         req.cookies = cookies;
     }
     next();
-        
-    // if it does exist
-        // compare to session id datastore and grab data
+    
 };
 
 module.exports = parseCookies;
