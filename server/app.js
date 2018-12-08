@@ -5,6 +5,8 @@ const partials = require('express-partials');
 const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
+//we are adding user class
+const user = require('./models/user.js');
 
 const app = express();
 
@@ -77,6 +79,42 @@ app.post('/links',
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+app.post('/signup', (req, res, next) => {
+  var username = req.body.username;
+  var password = req.body.password;
+
+
+  return user.create({username, password})
+   .then(data=>{
+      // console.log("BOJACK HORSEMAN", data);
+      // res.send(data);
+      // console.log("RES HEADERS", res.headers);
+      res.redirect(201, '/');
+    }).catch(err => {
+      res.redirect(500, '/signup');
+    });
+})
+
+app.post('/login', (req, res) => {
+  //get user username and password, password is already salted
+  //salt their req password and compare with the username salted password
+  //then on success, redirect to 201, root /
+  // on failure, do 404
+  var username = req.body.username;
+  var password = req.body.password;
+
+  return user.get({username: username})
+  .then(data => {
+    if (user.compare(password, data.password, data.salt)) {
+      res.redirect(201, '/');
+    } else {
+      res.redirect(404, '/login');
+    }
+  }).catch(err => {
+    res.redirect(404, '/login');
+  })
+
+})
 
 
 
