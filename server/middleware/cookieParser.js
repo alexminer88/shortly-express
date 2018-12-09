@@ -8,7 +8,7 @@ const parseCookies = (req, res, next) => {
         // create new session id and send back in response
 
 
-
+        next();
     } else {
         req.headers.cookie.split('; ').forEach((element)=>{
             var arr = element.split('=');

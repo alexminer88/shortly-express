@@ -3,7 +3,8 @@ const path = require('path');
 const utils = require('./lib/hashUtils');
 const partials = require('express-partials');
 const bodyParser = require('body-parser');
-const Auth = require('./middleware/auth');
+const Auth = require('./middleware/auth.js');
+const parseCookies = require('./middleware/cookieParser.js');
 const models = require('./models');
 //we are adding user class
 const user = require('./models/user.js');
@@ -17,9 +18,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+app.use(parseCookies);
+app.use(Auth.createSession);
 
 
-app.get('/', 
+
+
+app.get('/',
 (req, res) => {
   res.render('index');
 });
@@ -83,16 +88,21 @@ app.post('/signup', (req, res, next) => {
   var username = req.body.username;
   var password = req.body.password;
 
-
+// check if user name exists
+  // if exists, redirect to signup
+  // otherwise create a user
   return user.create({username, password})
    .then(data=>{
       // console.log("BOJACK HORSEMAN", data);
       // res.send(data);
       // console.log("RES HEADERS", res.headers);
-      res.redirect(201, '/');
+      res.redirect('/');
     }).catch(err => {
-      res.redirect(500, '/signup');
-    });
+      res.redirect('/signup');
+    })
+    // .then(results => {
+    //   models.Sessions.update({hash: req.session.hash}, {userId: results.insertId})
+    // });
 })
 
 app.post('/login', (req, res) => {
@@ -106,12 +116,12 @@ app.post('/login', (req, res) => {
   return user.get({username: username})
   .then(data => {
     if (user.compare(password, data.password, data.salt)) {
-      res.redirect(201, '/');
+      res.redirect('/');
     } else {
-      res.redirect(404, '/login');
+      res.redirect('/login');
     }
-  }).catch(err => {
-    res.redirect(404, '/login');
+  }).catch(() => {
+    res.redirect('/login');
   })
 
 })
